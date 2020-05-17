@@ -115,6 +115,14 @@ var (
 		AgentID: `{{ template "wechat.default.agent_id" . }}`,
 	}
 
+	DefaultDingtalkConfig = DingtalkConfig{
+		NotifierConfig: NotifierConfig{
+			VSendResolved: false,
+		},
+		AccessToken: `{{ template "dingtalk.default.access_token" . }}`,
+		MessageType: `{{ template "dingtalk.default.message_type" . }}`,
+	}
+
 	// DefaultVictorOpsConfig defines default values for VictorOps configurations.
 	DefaultVictorOpsConfig = VictorOpsConfig{
 		NotifierConfig: NotifierConfig{
@@ -447,6 +455,23 @@ type WechatConfig struct {
 func (c *WechatConfig) UnmarshalYAML(unmarshal func(interface{}) error) error {
 	*c = DefaultWechatConfig
 	type plain WechatConfig
+	return unmarshal((*plain)(c))
+}
+
+// DingtalkConfig configures notifications via Dingtalk
+type DingtalkConfig struct {
+	NotifierConfig `yaml:",inline" json:",inline"`
+
+	HTTPConfig *commoncfg.HTTPClientConfig `yaml:"http_config,omitempty" json:"http_config,omitempty"`
+
+	AccessToken string `yaml:"access_token,omitempty" json:"access_token,omitempty"`
+	MessageType string `yaml:"message_type,omitempty" json:"message_type,omitempty"`
+}
+
+// UnmarshalYAML
+func (c *DingtalkConfig) UnmarshalYAML(unmarshal func(interface{}) error) error {
+	*c = DefaultDingtalkConfig
+	type plain DingtalkConfig
 	return unmarshal((*plain)(c))
 }
 
